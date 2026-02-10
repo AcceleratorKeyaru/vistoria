@@ -1,28 +1,66 @@
 <!doctype html>
 <html lang="pt-br"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Vistoria Remota</title>
-<style>
-body{font-family:Arial;background:#0b1020;color:#fff;text-align:center;padding:40px}
-button{padding:14px 18px;border-radius:12px;border:none;background:#4ea3ff;color:#fff;font-size:16px;cursor:pointer}
-a{color:#9cd3ff}
-.card{background:#121a33;padding:25px;border-radius:16px;max-width:600px;margin:auto}
-</style></head><body>
-<div class="card">
-<h2>Painel de Vistoria</h2>
-<button onclick="gerar()">Gerar links</button>
-<p><b>Link do associado:</b></p><p><a id="cam" target="_blank">—</a></p>
-<p><b>Seu link:</b></p><p><a id="view" target="_blank">—</a></p>
+<link rel="stylesheet" href="./assets.css" />
+</head><body>
+<div class="wrap">
+  <div class="card hdr">
+    <h1>Vistoria Remota — Painel</h1>
+    <div class="badge ok"><span class="dot"></span><span>1 clique (sem app)</span></div>
+  </div>
+
+  <div class="card grid">
+    <div class="row">
+      <button class="btn primary" id="btnNew">Gerar links da vistoria</button>
+      <button class="btn" id="btnCopyCam">Copiar link do associado</button>
+      <button class="btn" id="btnCopyView">Copiar link do atendente</button>
+    </div>
+
+    <p class="small">
+      ✅ O associado só precisa <b>clicar</b> no link e permitir a câmera.<br/>
+      📷 Tentamos forçar a câmera traseira automaticamente (depende do Android/browser).<br/>
+      Dica: se abrir na frontal, toque em <span class="code">Trocar câmera</span> dentro da tela.
+    </p>
+
+    <div class="card links">
+      <p class="small"><b>Link do associado (câmera):</b></p>
+      <div class="linkline"><a id="cam" target="_blank">—</a></div>
+
+      <p class="small" style="margin-top:12px"><b>Seu link (assistir):</b></p>
+      <div class="linkline"><a id="view" target="_blank">—</a></div>
+    </div>
+
+    <p class="small">Segurança: os links geram uma sala aleatória difícil de adivinhar.</p>
+  </div>
 </div>
+
 <script>
-function gerar(){
- const r="vistoria-"+Math.random().toString(36).substring(2,10);
- const base=location.origin+location.pathname.replace("index.html","");
- const cam=base+"camera.html?r="+r;
- const view=base+"assistir.html?r="+r;
- document.getElementById("cam").href=cam;
- document.getElementById("cam").textContent=cam;
- document.getElementById("view").href=view;
- document.getElementById("view").textContent=view;
+function roomId(){
+  return "v-" + crypto.getRandomValues(new Uint32Array(1))[0].toString(16) + "-" + Math.random().toString(36).slice(2,8);
 }
-</script></body></html>
+function basePath(){
+  const p = location.pathname;
+  const dir = p.endsWith("/") ? p : p.substring(0, p.lastIndexOf("/") + 1);
+  return location.origin + dir;
+}
+function setLinks(r){
+  const base = basePath();
+  const cam = base + "camera.html?r=" + encodeURIComponent(r);
+  const view = base + "assistir.html?r=" + encodeURIComponent(r);
+  camEl.href = cam; camEl.textContent = cam;
+  viewEl.href = view; viewEl.textContent = view;
+}
+async function copy(text){
+  try{ await navigator.clipboard.writeText(text); alert("Copiado!"); }
+  catch{ prompt("Copie:", text); }
+}
+const camEl = document.getElementById("cam");
+const viewEl = document.getElementById("view");
+document.getElementById("btnNew").onclick = () => setLinks(roomId());
+document.getElementById("btnCopyCam").onclick = () => camEl.href ? copy(camEl.href) : alert("Gere os links primeiro.");
+document.getElementById("btnCopyView").onclick = () => viewEl.href ? copy(viewEl.href) : alert("Gere os links primeiro.");
+setLinks(roomId());
+</script>
+</body></html>

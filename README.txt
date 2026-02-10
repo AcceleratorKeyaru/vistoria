@@ -1,8 +1,10 @@
-PASSO A PASSO:
+VISTORIA REMOTA - V2 (GitHub Pages)
 
-1) Crie um GitHub
-2) Crie um repositório
-3) Envie TODOS arquivos
-4) Settings -> Pages -> Deploy from main
+Melhorias:
+- Visual mais "nosso" (overlay próprio + UI mínima)
+- Entrar direto (prejoin desativado)
+- Tentativa automática de câmera traseira (quando o Android/browser permite)
+- Self-view ligado (associado se enxerga)
 
-Abra o link gerado e clique "Gerar links".
+Deploy:
+- Substitua os arquivos do seu repositório do GitHub Pages por estes.
