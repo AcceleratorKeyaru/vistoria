@@ -1,0 +1,9 @@
+<!doctype html>
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;background:#000}</style></head>
+<body>
+<div id="meet" style="width:100vw;height:100vh"></div>
+<script src="https://meet.jit.si/external_api.js"></script>
+<script>
+const r=new URL(location.href).searchParams.get("r")||"vistoria-demo";
+new JitsiMeetExternalAPI("meet.jit.si",{roomName:r,parentNode:document.querySelector("#meet"),configOverwrite:{startWithAudioMuted:true,startWithVideoMuted:false}});
+</script></body></html>

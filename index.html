@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-br"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vistoria Remota</title>
+<style>
+body{font-family:Arial;background:#0b1020;color:#fff;text-align:center;padding:40px}
+button{padding:14px 18px;border-radius:12px;border:none;background:#4ea3ff;color:#fff;font-size:16px;cursor:pointer}
+a{color:#9cd3ff}
+.card{background:#121a33;padding:25px;border-radius:16px;max-width:600px;margin:auto}
+</style></head><body>
+<div class="card">
+<h2>Painel de Vistoria</h2>
+<button onclick="gerar()">Gerar links</button>
+<p><b>Link do associado:</b></p><p><a id="cam" target="_blank">—</a></p>
+<p><b>Seu link:</b></p><p><a id="view" target="_blank">—</a></p>
+</div>
+<script>
+function gerar(){
+ const r="vistoria-"+Math.random().toString(36).substring(2,10);
+ const base=location.origin+location.pathname.replace("index.html","");
+ const cam=base+"camera.html?r="+r;
+ const view=base+"assistir.html?r="+r;
+ document.getElementById("cam").href=cam;
+ document.getElementById("cam").textContent=cam;
+ document.getElementById("view").href=view;
+ document.getElementById("view").textContent=view;
+}
+</script></body></html>
