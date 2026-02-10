@@ -1,79 +1,61 @@
-<!doctype html>
-<html lang="pt-br"><head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Vistoria — Assistir</title>
-<link rel="stylesheet" href="./assets.css" />
-</head>
+<!doctype html><html lang="pt-br"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Vistoria — Assistir</title><link rel="stylesheet" href="./assets.css"/></head>
 <body style="background:#000">
 <div class="overlay">
-  <div class="card" style="padding:10px 12px; max-width: 640px">
+  <div class="card" style="padding:10px 12px;max-width:720px">
     <div class="hdr" style="gap:10px">
-      <div class="brand">
-        <b>Vistoria — Assistir</b>
-        <span id="roomTxt">Sala: —</span>
-      </div>
+      <div class="brand"><b>Vistoria — Assistir (modo streaming)</b><span id="roomTxt">Sala: —</span></div>
       <div id="status" class="badge"><span class="dot"></span><span id="statusTxt">Conectando…</span></div>
     </div>
     <div class="row" style="margin-top:10px">
       <button class="btn primary" id="btnReload">Recarregar</button>
       <button class="btn" id="btnFull">Tela cheia</button>
+      <button class="btn danger" id="btnReset">Re-focar vídeo</button>
     </div>
-    <div class="small" style="margin-top:8px">
-      Se estiver preto, o associado ainda não permitiu a câmera ou está em outra sala.
-    </div>
+    <div class="small" style="margin-top:8px">Tela de assistir: fixa automaticamente no vídeo do associado.</div>
   </div>
 </div>
-
 <div id="meet" class="meet"></div>
-
 <script src="https://meet.jit.si/external_api.js"></script>
 <script>
-const statusEl = document.getElementById("status");
-const statusTxt = document.getElementById("statusTxt");
-const roomTxt = document.getElementById("roomTxt");
+const statusEl=document.getElementById("status"),statusTxt=document.getElementById("statusTxt"),roomTxt=document.getElementById("roomTxt");
+function setStatus(mode,text){statusEl.classList.remove("ok","err");if(mode)statusEl.classList.add(mode);statusTxt.textContent=text;}
+document.getElementById("btnReload").onclick=()=>location.reload();
+document.getElementById("btnFull").onclick=()=>{const el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();};
+const u=new URL(location.href);const room=(u.searchParams.get("r")||"").trim();if(!room)alert("Sala ausente. Abra pelo painel.");
+roomTxt.textContent="Sala: "+(room||"—");
 
-function setStatus(mode, text){
-  statusEl.classList.remove("ok","err");
-  if(mode) statusEl.classList.add(mode);
-  statusTxt.textContent = text;
+function focus(api, arr){
+  if(!arr||!arr.length) return false;
+  const target = arr.find(p => (p.displayName||"").toLowerCase()==="associado") || arr[0];
+  const pid = target.participantId;
+  try{api.executeCommand('setTileView',false);}catch{}
+  try{api.executeCommand('pinParticipant',pid);}catch{}
+  try{api.executeCommand('setLargeVideoParticipant',pid);}catch{}
+  return true;
 }
 
-document.getElementById("btnReload").onclick = () => location.reload();
-document.getElementById("btnFull").onclick = () => {
-  const el = document.documentElement;
-  if(el.requestFullscreen) el.requestFullscreen();
+const api=new JitsiMeetExternalAPI("meet.jit.si",{
+  roomName:room||"vistoria-demo",parentNode:document.querySelector("#meet"),width:"100%",height:"100%",
+  userInfo:{displayName:"Atendente"},
+  configOverwrite:{prejoinPageEnabled:false,startWithAudioMuted:true,startWithVideoMuted:true,disableDeepLinking:true,disableSelfView:true,enableWelcomePage:false,analytics:{disabled:true}},
+  interfaceConfigOverwrite:{SHOW_JITSI_WATERMARK:false,SHOW_WATERMARK_FOR_GUESTS:false,MOBILE_APP_PROMO:false,DISABLE_JOIN_LEAVE_NOTIFICATIONS:true,DISABLE_FOCUS_INDICATOR:true,FILM_STRIP_MAX_HEIGHT:0,VERTICAL_FILMSTRIP:false,TOOLBAR_BUTTONS:['hangup','fullscreen']}
+});
+try{api.executeCommand('setTileView',false);}catch{}
+api.addEventListener("videoConferenceJoined",async()=>{
+  setStatus(null,"Aguardando transmissor…");
+  try{const info=await api.getParticipantsInfo(); if(focus(api,info)) setStatus("ok","Ao vivo");}catch{}
+});
+api.addEventListener("participantJoined",async()=>{
+  setStatus(null,"Conectando vídeo…");
+  try{const info=await api.getParticipantsInfo(); if(focus(api,info)) setStatus("ok","Ao vivo"); else setStatus("ok","Ao vivo");}catch{setStatus("ok","Ao vivo");}
+});
+api.addEventListener("participantLeft",()=>setStatus(null,"Aguardando transmissor…"));
+api.addEventListener("readyToClose",()=>setStatus(null,"Encerrado"));
+api.addEventListener("errorOccurred",()=>setStatus("err","Erro"));
+
+document.getElementById("btnReset").onclick=async()=>{
+  try{const info=await api.getParticipantsInfo(); focus(api,info);}catch{}
 };
-
-const url = new URL(location.href);
-const room = (url.searchParams.get("r") || "").trim();
-if(!room){ alert("Sala ausente. Abra pelo painel (index)."); }
-roomTxt.textContent = "Sala: " + (room || "—");
-
-const options = {
-  roomName: room || "vistoria-demo",
-  parentNode: document.querySelector("#meet"),
-  width: "100%",
-  height: "100%",
-  userInfo: { displayName: "Atendente" },
-  configOverwrite: {
-    prejoinPageEnabled: false,
-    startWithAudioMuted: true,
-    startWithVideoMuted: true,
-    disableDeepLinking: true
-  },
-  interfaceConfigOverwrite: {
-    SHOW_JITSI_WATERMARK: false,
-    SHOW_WATERMARK_FOR_GUESTS: false,
-    MOBILE_APP_PROMO: false,
-    DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
-    TOOLBAR_BUTTONS: ['hangup', 'fullscreen']
-  }
-};
-
-const api = new JitsiMeetExternalAPI("meet.jit.si", options);
-api.addEventListener("videoConferenceJoined", () => setStatus("ok", "Ao vivo"));
-api.addEventListener("readyToClose", () => setStatus(null, "Encerrado"));
-api.addEventListener("errorOccurred", () => setStatus("err", "Erro"));
-</script>
-</body></html>
+</script></body></html>
