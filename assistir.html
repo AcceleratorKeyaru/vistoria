@@ -3,17 +3,18 @@
 <title>Vistoria — Assistir</title><link rel="stylesheet" href="./assets.css"/></head>
 <body style="background:#000">
 <div class="overlay">
-  <div class="card" style="padding:10px 12px;max-width:720px">
+  <div class="card" style="padding:10px 12px;max-width:760px">
     <div class="hdr" style="gap:10px">
-      <div class="brand"><b>Vistoria — Assistir (modo streaming)</b><span id="roomTxt">Sala: —</span></div>
+      <div class="brand"><b>Vistoria — Assistir</b><span id="roomTxt">Sala: —</span></div>
       <div id="status" class="badge"><span class="dot"></span><span id="statusTxt">Conectando…</span></div>
     </div>
     <div class="row" style="margin-top:10px">
       <button class="btn primary" id="btnReload">Recarregar</button>
       <button class="btn" id="btnFull">Tela cheia</button>
-      <button class="btn danger" id="btnReset">Re-focar vídeo</button>
+      <button class="btn" id="btnMic">Falar (mic)</button>
+      <button class="btn" id="btnCam">Mostrar câmera</button>
     </div>
-    <div class="small" style="margin-top:8px">Tela de assistir: fixa automaticamente no vídeo do associado.</div>
+    <div class="small" style="margin-top:8px">Você pode orientar o associado ativando microfone/câmera.</div>
   </div>
 </div>
 <div id="meet" class="meet"></div>
@@ -23,39 +24,16 @@ const statusEl=document.getElementById("status"),statusTxt=document.getElementBy
 function setStatus(mode,text){statusEl.classList.remove("ok","err");if(mode)statusEl.classList.add(mode);statusTxt.textContent=text;}
 document.getElementById("btnReload").onclick=()=>location.reload();
 document.getElementById("btnFull").onclick=()=>{const el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();};
-const u=new URL(location.href);const room=(u.searchParams.get("r")||"").trim();if(!room)alert("Sala ausente. Abra pelo painel.");
-roomTxt.textContent="Sala: "+(room||"—");
-
-function focus(api, arr){
-  if(!arr||!arr.length) return false;
-  const target = arr.find(p => (p.displayName||"").toLowerCase()==="associado") || arr[0];
-  const pid = target.participantId;
-  try{api.executeCommand('setTileView',false);}catch{}
-  try{api.executeCommand('pinParticipant',pid);}catch{}
-  try{api.executeCommand('setLargeVideoParticipant',pid);}catch{}
-  return true;
-}
+const u=new URL(location.href);const room=(u.searchParams.get("r")||"vistoria-demo").trim();roomTxt.textContent="Sala: "+room;
 
 const api=new JitsiMeetExternalAPI("meet.jit.si",{
-  roomName:room||"vistoria-demo",parentNode:document.querySelector("#meet"),width:"100%",height:"100%",
+  roomName:room,parentNode:document.querySelector("#meet"),width:"100%",height:"100%",
   userInfo:{displayName:"Atendente"},
   configOverwrite:{prejoinPageEnabled:false,startWithAudioMuted:true,startWithVideoMuted:true,disableDeepLinking:true,disableSelfView:true,enableWelcomePage:false,analytics:{disabled:true}},
-  interfaceConfigOverwrite:{SHOW_JITSI_WATERMARK:false,SHOW_WATERMARK_FOR_GUESTS:false,MOBILE_APP_PROMO:false,DISABLE_JOIN_LEAVE_NOTIFICATIONS:true,DISABLE_FOCUS_INDICATOR:true,FILM_STRIP_MAX_HEIGHT:0,VERTICAL_FILMSTRIP:false,TOOLBAR_BUTTONS:['hangup','fullscreen']}
+  interfaceConfigOverwrite:{SHOW_JITSI_WATERMARK:false,SHOW_WATERMARK_FOR_GUESTS:false,MOBILE_APP_PROMO:false,DISABLE_JOIN_LEAVE_NOTIFICATIONS:true,DISABLE_FOCUS_INDICATOR:true,FILM_STRIP_MAX_HEIGHT:0,VERTICAL_FILMSTRIP:false,TOOLBAR_BUTTONS:['hangup','fullscreen','microphone','camera']}
 });
-try{api.executeCommand('setTileView',false);}catch{}
-api.addEventListener("videoConferenceJoined",async()=>{
-  setStatus(null,"Aguardando transmissor…");
-  try{const info=await api.getParticipantsInfo(); if(focus(api,info)) setStatus("ok","Ao vivo");}catch{}
-});
-api.addEventListener("participantJoined",async()=>{
-  setStatus(null,"Conectando vídeo…");
-  try{const info=await api.getParticipantsInfo(); if(focus(api,info)) setStatus("ok","Ao vivo"); else setStatus("ok","Ao vivo");}catch{setStatus("ok","Ao vivo");}
-});
-api.addEventListener("participantLeft",()=>setStatus(null,"Aguardando transmissor…"));
-api.addEventListener("readyToClose",()=>setStatus(null,"Encerrado"));
-api.addEventListener("errorOccurred",()=>setStatus("err","Erro"));
-
-document.getElementById("btnReset").onclick=async()=>{
-  try{const info=await api.getParticipantsInfo(); focus(api,info);}catch{}
-};
+api.addEventListener("videoConferenceJoined",()=>setStatus(null,"Aguardando transmissor…"));
+api.addEventListener("participantJoined",()=>setStatus("ok","Ao vivo"));
+document.getElementById("btnMic").onclick=()=>api.executeCommand('toggleAudio');
+document.getElementById("btnCam").onclick=()=>api.executeCommand('toggleVideo');
 </script></body></html>

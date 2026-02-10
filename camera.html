@@ -13,38 +13,38 @@
       <button class="btn" id="btnHelp">Ajuda</button>
     </div>
     <div id="help" class="small" style="display:none;margin-top:8px">
-      1) Clique em <b>Permitir</b> (câmera).<br/>
-      2) Se abrir na frontal, toque em <b>Trocar câmera</b> (ícone) dentro da tela.<br/>
-      3) Você se enxerga para ajustar o enquadramento.
+      Você verá um <b>preview grande</b> da sua câmera para enquadrar. Permita a câmera.
     </div>
   </div>
-  <div class="pill">Dica: use a câmera traseira para filmar placa/chassi/motor</div>
 </div>
-<div id="meet" class="meet"></div>
+<video id="preview" playsinline autoplay muted style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0"></video>
+<div id="meet" class="meet" style="position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.01"></div>
 <script src="https://meet.jit.si/external_api.js"></script>
 <script>
 const statusEl=document.getElementById("status"),statusTxt=document.getElementById("statusTxt"),roomTxt=document.getElementById("roomTxt");
 function setStatus(mode,text){statusEl.classList.remove("ok","err");if(mode)statusEl.classList.add(mode);statusTxt.textContent=text;}
 document.getElementById("btnRetry").onclick=()=>location.reload();
-document.getElementById("btnHelp").onclick=()=>{const h=document.getElementById("help");h.style.display=(h.style.display==="none")?"block":"none";};
+document.getElementById("btnHelp").onclick=()=>{const h=document.getElementById("help");h.styleo=h.style;h.style.display=(h.style.display==="none")?"block":"none";};
 const u=new URL(location.href);const room=(u.searchParams.get("r")||"vistoria-demo").trim();roomTxt.textContent="Sala: "+room;
-async function pickRearLabel(){try{const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});
-const t=s.getVideoTracks()[0];const label=t&&t.label?t.label:null;s.getTracks().forEach(x=>x.stop());return label;}catch{return null;}}
+
+async function startPreview(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});
+    const v=document.getElementById("preview");v.srcObject=stream;v.muted=true;v.play();
+    setStatus("ok","Transmitindo (preview)");
+    return true;
+  }catch(e){setStatus("err","Permita a câmera");return false;}
+}
+
 (async()=>{
-  setStatus(null,"Conectando…");
-  const rear=await pickRearLabel();
+  setStatus(null,"Solicitando câmera…");
+  const ok=await startPreview();
   const api=new JitsiMeetExternalAPI("meet.jit.si",{
     roomName:room,parentNode:document.querySelector("#meet"),width:"100%",height:"100%",
     userInfo:{displayName:"Associado"},
-    devices:rear?{videoInput:rear}:undefined,
     configOverwrite:{prejoinPageEnabled:false,startWithAudioMuted:true,startWithVideoMuted:false,disableDeepLinking:true,disableSelfView:false,enableWelcomePage:false,analytics:{disabled:true}},
-    interfaceConfigOverwrite:{SHOW_JITSI_WATERMARK:false,SHOW_WATERMARK_FOR_GUESTS:false,MOBILE_APP_PROMO:false,DISABLE_JOIN_LEAVE_NOTIFICATIONS:true,DISABLE_FOCUS_INDICATOR:true,FILM_STRIP_MAX_HEIGHT:0,VERTICAL_FILMSTRIP:false,
-      TOOLBAR_BUTTONS:['toggle-camera','camera','hangup','fullscreen']}
+    interfaceConfigOverwrite:{SHOW_JITSI_WATERMARK:false,SHOW_WATERMARK_FOR_GUESTS:false,MOBILE_APP_PROMO:false,DISABLE_JOIN_LEAVE_NOTIFICATIONS:true,DISABLE_FOCUS_INDICATOR:true,FILM_STRIP_MAX_HEIGHT:0,VERTICAL_FILMSTRIP:false,TOOLBAR_BUTTONS:['toggle-camera','hangup']}
   });
-  try{api.executeCommand('setTileView',false);}catch{}
-  api.addEventListener("videoConferenceJoined",()=>setStatus("ok","Transmitindo"));
-  api.addEventListener("readyToClose",()=>setStatus(null,"Encerrado"));
-  api.addEventListener("errorOccurred",()=>setStatus("err","Erro"));
-  setStatus(null,"Abrindo câmera…");
+  api.addEventListener("videoConferenceJoined",()=>setStatus("ok","Ao vivo"));
 })();
 </script></body></html>

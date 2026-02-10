@@ -1,1 +1,1 @@
-V3 - Modo streaming. Substitua os arquivos no GitHub Pages por estes.
+V4 - preview local grande + controles do atendente + créditos.
