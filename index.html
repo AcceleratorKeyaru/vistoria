@@ -2,19 +2,21 @@
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Vistoria Remota</title><link rel="stylesheet" href="./assets.css"/></head>
 <body><div class="wrap">
-<div class="card hdr"><h1>Vistoria Remota — Painel</h1><div class="badge ok"><span class="dot"></span><span>Modo streaming (v5)</span></div></div>
-<div class="card">
-  <div class="row">
-    <button class="btn primary" id="btnNew">Gerar links da vistoria</button>
-    <button class="btn" id="btnCopyCam">Copiar link do associado</button>
-    <button class="btn" id="btnCopyView">Copiar link do atendente</button>
-  </div>
-  <p class="small">Associado: 1 clique e permite a câmera. Atendente: assiste em tela cheia.</p>
-  <div class="card links" style="margin-top:12px">
-    <p class="small"><b>Link do associado (câmera):</b></p><div class="linkline"><a id="cam" target="_blank">—</a></div>
-    <p class="small" style="margin-top:12px"><b>Seu link (assistir):</b></p><div class="linkline"><a id="view" target="_blank">—</a></div>
-  </div>
-  <p class="small" style="margin-top:16px">Plataforma desenvolvida por <b>Pedro Vinícius Moraes Alves</b>.</p>
+<div class="card hdr"><h1>Vistoria Remota — Painel</h1><div class="badge ok"><span class="dot"></span><span>Modo streaming (v3)</span></div></div>
+<div class="card grid">
+<div class="row">
+<button class="btn primary" id="btnNew">Gerar links da vistoria</button>
+<button class="btn" id="btnCopyCam">Copiar link do associado</button>
+<button class="btn" id="btnCopyView">Copiar link do atendente</button>
+</div>
+<p class="small">✅ O associado só clica e permite a câmera.<br/>🎥 O atendente vê em tela cheia, sem “grade” e sem bolinha do atendente.<br/>📷 Tentamos abrir na câmera traseira automaticamente (depende do Android/browser).</p>
+<div class="card links">
+<p class="small"><b>Link do associado (câmera):</b></p><div class="linkline"><a id="cam" target="_blank">—</a></div>
+<p class="small" style="margin-top:12px"><b>Seu link (assistir):</b></p><div class="linkline"><a id="view" target="_blank">—</a></div>
+</div>
+<p class="small">Segurança: salas aleatórias difíceis de adivinhar.</p>
+</div>
+<p class="small" style="margin-top:14px">Plataforma desenvolvida por <b>Pedro Vinícius Moraes Alves</b>.</p>
 </div></div>
 <script>
 function roomId(){return "v-"+crypto.getRandomValues(new Uint32Array(1))[0].toString(16)+"-"+Math.random().toString(36).slice(2,8);}

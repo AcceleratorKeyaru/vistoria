@@ -1,1 +1,1 @@
-V5 - Jitsi abre a câmera e preview espelha; status de presença; auto-pin no viewer.
+V3 - Modo streaming. Substitua os arquivos no GitHub Pages por estes.
