@@ -1,0 +1,74 @@
+
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vistoria — Dashboard</title>
+  <link rel="stylesheet" href="assets.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <div class="h-title">
+          <h1>Dashboard — Vistoria Remota</h1>
+          <div class="sub">Geração de links (abrir atendente primeiro)</div>
+        </div>
+        <div class="row" style="justify-content:flex-end;">
+          <div class="badge"><span class="dot good"></span><span>Autenticado</span></div>
+          <button id="logout" class="btn">Sair</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="small">
+          Fluxo recomendado:
+          <b>1) Atendente abre o link do Atendente</b> (vira moderador) →
+          <b>2) Envie o link do Associado</b>.
+        </div>
+
+        <div class="row">
+          <input id="room" class="input" placeholder="Sala (ex: v-123abc)" />
+          <button id="btnNew" class="btn primary">Nova sala</button>
+        </div>
+
+        <div class="kv">
+          <div class="k">Link do Atendente</div>
+          <div class="v"><a id="hostLink" href="#" target="_blank" rel="noopener"></a></div>
+
+          <div class="k">Link do Associado</div>
+          <div class="v"><a id="guestLink" href="#" target="_blank" rel="noopener"></a></div>
+        </div>
+
+        <div class="row">
+          <button id="copyHost" class="btn">Copiar atendente</button>
+          <button id="copyGuest" class="btn">Copiar associado</button>
+          <button id="copyBoth" class="btn">Copiar ambos</button>
+        </div>
+
+        <hr class="sep" />
+        <div class="small">
+          ✅ Créditos: Plataforma desenvolvida por <b>Pedro Vinícius Moraes Alves</b><br/>
+          ⚠️ Observação: como está hospedado no GitHub Pages, a proteção por login é no navegador (suficiente para impedir uso casual).
+        </div>
+
+        <div id="toast" class="badge" style="opacity:0; transition:.2s opacity; width:fit-content;">
+          <span class="dot good"></span><span>Copiado!</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="credits">
+    Plataforma desenvolvida por <b>Pedro Vinícius Moraes Alves</b>
+  </footer>
+
+  <script src="auth.js"></script>
+  <script src="admin.js"></script>
+  <script>
+    requireAuthOrRedirect();
+    initAdmin();
+  </script>
+</body>
+</html>

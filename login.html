@@ -1,0 +1,65 @@
+
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vistoria — Login</title>
+  <link rel="stylesheet" href="assets.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <div class="h-title">
+          <h1>Vistoria Remota — Painel</h1>
+          <div class="sub">Acesso restrito</div>
+        </div>
+        <div class="badge"><span class="dot warn"></span><span>Login</span></div>
+      </div>
+      <div class="grid">
+        <div class="small">Use seu usuário e senha para acessar o gerador de links.</div>
+        <input id="user" class="input" placeholder="Usuário" autocomplete="username" />
+        <input id="pass" class="input" placeholder="Senha" type="password" autocomplete="current-password" />
+        <div class="row">
+          <button id="btn" class="btn primary">Entrar</button>
+          <div id="msg" class="small"></div>
+        </div>
+        <hr class="sep" />
+        <div class="small">
+          Dica: se você quiser trocar a senha padrão, edite o arquivo <b>auth.js</b> e publique de novo.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="credits">
+    Plataforma desenvolvida por <b>Pedro Vinícius Moraes Alves</b>
+  </footer>
+
+  <script src="auth.js"></script>
+  <script>
+    // If already logged in, go to admin
+    if(hasSession()) location.href = "admin.html";
+    const qs = new URLSearchParams(location.search);
+    const next = qs.get("next") || "admin.html";
+
+    const btn = document.getElementById("btn");
+    btn.onclick = async ()=>{
+      const user = document.getElementById("user").value.trim();
+      const pass = document.getElementById("pass").value;
+      const ok = await login(user, pass);
+      const msg = document.getElementById("msg");
+      if(ok){
+        msg.textContent = "Ok. Entrando...";
+        location.href = next;
+      } else {
+        msg.textContent = "Usuário ou senha inválidos.";
+      }
+    };
+    document.getElementById("pass").addEventListener("keydown",(e)=>{
+      if(e.key==="Enter") btn.click();
+    });
+  </script>
+</body>
+</html>
