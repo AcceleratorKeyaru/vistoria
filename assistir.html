@@ -10,9 +10,6 @@
     </div>
     <div class="row" style="margin-top:10px">
       <button class="btn primary" id="btnReload">Recarregar</button>
-      <button class="btn" id="btnFull">Tela cheia</button>
-      <button class="btn" id="btnMic">Falar (mic)</button>
-      <button class="btn" id="btnCam">Mostrar câmera</button>
       <button class="btn danger" id="btnReset">Re-focar vídeo</button>
     </div>
     <div class="small" style="margin-top:8px">Tela de assistir: fixa automaticamente no vídeo do associado.</div>
@@ -42,7 +39,7 @@ const api=new JitsiMeetExternalAPI("meet.jit.si",{
   roomName:room||"vistoria-demo",parentNode:document.querySelector("#meet"),width:"100%",height:"100%",
   userInfo:{displayName:"Atendente"},
   configOverwrite:{prejoinPageEnabled:false,startWithAudioMuted:true,startWithVideoMuted:true,disableDeepLinking:true,disableSelfView:true,enableWelcomePage:false,analytics:{disabled:true}},
-  interfaceConfigOverwrite:{SHOW_JITSI_WATERMARK:false,SHOW_WATERMARK_FOR_GUESTS:false,MOBILE_APP_PROMO:false,DISABLE_JOIN_LEAVE_NOTIFICATIONS:true,DISABLE_FOCUS_INDICATOR:true,FILM_STRIP_MAX_HEIGHT:0,VERTICAL_FILMSTRIP:false,TOOLBAR_BUTTONS:['hangup','fullscreen','microphone','camera']}
+  interfaceConfigOverwrite:{SHOW_JITSI_WATERMARK:false,SHOW_WATERMARK_FOR_GUESTS:false,MOBILE_APP_PROMO:false,DISABLE_JOIN_LEAVE_NOTIFICATIONS:true,DISABLE_FOCUS_INDICATOR:true,FILM_STRIP_MAX_HEIGHT:0,VERTICAL_FILMSTRIP:false,TOOLBAR_BUTTONS:['microphone','camera','fullscreen','hangup']}
 });
 try{api.executeCommand('setTileView',false);}catch{}
 api.addEventListener("videoConferenceJoined",async()=>{

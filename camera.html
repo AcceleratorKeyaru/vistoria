@@ -37,11 +37,11 @@ const t=s.getVideoTracks()[0];const label=t&&t.label?t.label:null;s.getTracks().
     roomName:room,parentNode:document.querySelector("#meet"),width:"100%",height:"100%",
     userInfo:{displayName:"Associado"},
     devices:rear?{videoInput:rear}:undefined,
-    configOverwrite:{prejoinPageEnabled:false,startWithAudioMuted:true,startWithVideoMuted:false,disableDeepLinking:true,disableSelfView:false,enableWelcomePage:false,analytics:{disabled:true}},
-    interfaceConfigOverwrite:{SHOW_JITSI_WATERMARK:false,SHOW_WATERMARK_FOR_GUESTS:false,MOBILE_APP_PROMO:false,DISABLE_JOIN_LEAVE_NOTIFICATIONS:true,DISABLE_FOCUS_INDICATOR:true,FILM_STRIP_MAX_HEIGHT:120,VERTICAL_FILMSTRIP:false,
-      TOOLBAR_BUTTONS:['toggle-camera','hangup','fullscreen','tileview']}
+    configOverwrite:{prejoinPageEnabled:false,startWithAudioMuted:true,startWithVideoMuted:false,disableDeepLinking:true,enableWelcomePage:false,analytics:{disabled:true},constraints:{video:{facingMode:'environment'}}},
+  interfaceConfigOverwrite:{SHOW_JITSI_WATERMARK:false,SHOW_WATERMARK_FOR_GUESTS:false,MOBILE_APP_PROMO:false,DISABLE_JOIN_LEAVE_NOTIFICATIONS:true,DISABLE_FOCUS_INDICATOR:true,FILM_STRIP_MAX_HEIGHT:0,VERTICAL_FILMSTRIP:false,
+      TOOLBAR_BUTTONS:['toggle-camera','hangup','camera']}
   });
-  try{api.executeCommand('setTileView',true);}catch{}
+  try{api.executeCommand('setTileView',false);}catch{}
   api.addEventListener("videoConferenceJoined",()=>setStatus("ok","Transmitindo"));
   api.addEventListener("readyToClose",()=>setStatus(null,"Encerrado"));
   api.addEventListener("errorOccurred",()=>setStatus("err","Erro"));
