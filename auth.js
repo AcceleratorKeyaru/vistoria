@@ -4,7 +4,7 @@
 const AUTH = {
   user: "admin",
   // sha256("admin:Autovip@1010")
-  hash: "7696ed43d54fbdd18b55146c05c059cbc9dac63f5caddee634edc6351723e1b8",
+  hash: "c4148ff26c3e36be70a2ba29b88e9f2eb0fa8103f89b2c865f52ca5263b21b5a",
   sessionKey: "vistoria_admin_session_v1",
   ttlMs: 1000 * 60 * 60 * 8, // 8h
 };
