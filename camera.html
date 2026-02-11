@@ -2,49 +2,60 @@
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Vistoria — Câmera</title><link rel="stylesheet" href="./assets.css"/></head>
 <body style="background:#000">
+<video id="preview" class="preview" playsinline autoplay muted></video>
 <div class="overlay">
   <div class="card" style="padding:10px 12px;max-width:640px">
     <div class="hdr" style="gap:10px">
       <div class="brand"><b>Vistoria — Câmera do Associado</b><span id="roomTxt">Sala: —</span></div>
-      <div id="status" class="badge"><span class="dot"></span><span id="statusTxt">Abrindo…</span></div>
+      <div id="status" class="badge warn"><span class="dot"></span><span id="statusTxt">Aguardando atendente…</span></div>
     </div>
-    <div class="row" style="margin-top:10px">
-      <button class="btn primary" id="btnRetry">Recarregar</button>
-      <button class="btn" id="btnHelp">Ajuda</button>
-    </div>
-    <div id="help" class="small" style="display:none;margin-top:8px">
-      Você verá um <b>preview grande</b> da sua câmera para enquadrar. Permita a câmera.
-    </div>
+    <div class="small" style="margin-top:8px">Permita a câmera. Você se vê em tela cheia. Quando o atendente entrar ficará <b>Conectado</b>.</div>
   </div>
 </div>
-<video id="preview" playsinline autoplay muted style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0"></video>
-<div id="meet" class="meet" style="position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.01"></div>
+<div id="meet" class="meet" style="position:fixed;inset:0;z-index:1;opacity:.01;pointer-events:none"></div>
 <script src="https://meet.jit.si/external_api.js"></script>
 <script>
 const statusEl=document.getElementById("status"),statusTxt=document.getElementById("statusTxt"),roomTxt=document.getElementById("roomTxt");
-function setStatus(mode,text){statusEl.classList.remove("ok","err");if(mode)statusEl.classList.add(mode);statusTxt.textContent=text;}
-document.getElementById("btnRetry").onclick=()=>location.reload();
-document.getElementById("btnHelp").onclick=()=>{const h=document.getElementById("help");h.styleo=h.style;h.style.display=(h.style.display==="none")?"block":"none";};
+function setStatus(mode,text){statusEl.classList.remove("ok","warn","err");if(mode)statusEl.classList.add(mode);statusTxt.textContent=text;}
 const u=new URL(location.href);const room=(u.searchParams.get("r")||"vistoria-demo").trim();roomTxt.textContent="Sala: "+room;
 
-async function startPreview(){
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});
-    const v=document.getElementById("preview");v.srcObject=stream;v.muted=true;v.play();
-    setStatus("ok","Transmitindo (preview)");
-    return true;
-  }catch(e){setStatus("err","Permita a câmera");return false;}
-}
+const api=new JitsiMeetExternalAPI("meet.jit.si",{
+  roomName:room,parentNode:document.querySelector("#meet"),width:"100%",height:"100%",
+  userInfo:{displayName:"Associado"},
+  configOverwrite:{prejoinPageEnabled:false,startWithAudioMuted:true,startWithVideoMuted:false,disableDeepLinking:true,enableWelcomePage:false,analytics:{disabled:true}},
+  interfaceConfigOverwrite:{SHOW_JITSI_WATERMARK:false,SHOW_WATERMARK_FOR_GUESTS:false,MOBILE_APP_PROMO:false,DISABLE_JOIN_LEAVE_NOTIFICATIONS:true,DISABLE_FOCUS_INDICATOR:true,FILM_STRIP_MAX_HEIGHT:0,VERTICAL_FILMSTRIP:false,TOOLBAR_BUTTONS:['toggle-camera','hangup']}
+});
 
-(async()=>{
-  setStatus(null,"Solicitando câmera…");
-  const ok=await startPreview();
-  const api=new JitsiMeetExternalAPI("meet.jit.si",{
-    roomName:room,parentNode:document.querySelector("#meet"),width:"100%",height:"100%",
-    userInfo:{displayName:"Associado"},
-    configOverwrite:{prejoinPageEnabled:false,startWithAudioMuted:true,startWithVideoMuted:false,disableDeepLinking:true,disableSelfView:false,enableWelcomePage:false,analytics:{disabled:true}},
-    interfaceConfigOverwrite:{SHOW_JITSI_WATERMARK:false,SHOW_WATERMARK_FOR_GUESTS:false,MOBILE_APP_PROMO:false,DISABLE_JOIN_LEAVE_NOTIFICATIONS:true,DISABLE_FOCUS_INDICATOR:true,FILM_STRIP_MAX_HEIGHT:0,VERTICAL_FILMSTRIP:false,TOOLBAR_BUTTONS:['toggle-camera','hangup']}
-  });
-  api.addEventListener("videoConferenceJoined",()=>setStatus("ok","Ao vivo"));
-})();
+function tryBindLocal(){
+  const frames = document.querySelectorAll('#meet iframe');
+  if(!frames.length) return;
+  const iframe = frames[0];
+  try{
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    const vids = doc.querySelectorAll('video');
+    let local = null;
+    vids.forEach(v=>{ if(v && v.srcObject){ local = v; }});
+    if(local){
+      const preview=document.getElementById('preview');
+      if(!preview.srcObject && local.srcObject){
+        preview.srcObject = local.srcObject;
+        preview.muted = true;
+        preview.play().catch(()=>{});
+      }
+    }
+  }catch(e){}
+}
+setInterval(tryBindLocal, 1000);
+
+api.addEventListener('videoConferenceJoined', ()=>{
+  setStatus('warn','Aguardando atendente…');
+});
+api.addEventListener('participantJoined', (p)=>{
+  if((p.displayName||'').toLowerCase()==='atendente'){
+    setStatus('ok','Atendente conectado');
+  }
+});
+api.addEventListener('participantLeft', ()=>{
+  setStatus('warn','Aguardando atendente…');
+});
 </script></body></html>

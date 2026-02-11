@@ -1,1 +1,1 @@
-V4 - preview local grande + controles do atendente + créditos.
+V5 - Jitsi abre a câmera e preview espelha; status de presença; auto-pin no viewer.
