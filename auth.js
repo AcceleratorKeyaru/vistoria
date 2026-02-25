@@ -3,7 +3,7 @@
 // Change credentials in this file then redeploy.
 const AUTH = {
   user: "admin",
-  // sha256
+  // sha256("admin:Autovip@1010")
   hash: "c4148ff26c3e36be70a2ba29b88e9f2eb0fa8103f89b2c865f52ca5263b21b5a",
   sessionKey: "vistoria_admin_session_v1",
   ttlMs: 1000 * 60 * 60 * 8, // 8h
