@@ -49,39 +49,6 @@ function initAdmin(){
     setHref("hostLink", l.host);
     setHref("guestLink", l.guest);
   });
-
-
-let recorder;
-let recordedChunks = [];
-
-async function iniciarGravacao() {
-    const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
-        audio: true
-    });
-
-    recorder = new MediaRecorder(stream);
-    recorder.ondataavailable = e => recordedChunks.push(e.data);
-    recorder.onstop = () => {
-        const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'vistoria_autovip.webm';
-        a.click();
-        recordedChunks = [];
-    };
-
-    recorder.start();
-    alert("Gravação iniciada");
-}
-
-function pararGravacao() {
-    if (recorder) {
-        recorder.stop();
-        alert("Gravação finalizada e download iniciado");
-    }
-}
-
   document.getElementById("copyHost").onclick = ()=>copyToClipboard(document.getElementById("hostLink").href);
   document.getElementById("copyGuest").onclick = ()=>copyToClipboard(document.getElementById("guestLink").href);
   document.getElementById("copyBoth").onclick = ()=>{
